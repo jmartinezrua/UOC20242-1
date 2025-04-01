@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <assert.h>
-#include "csv.h"
-#include "api.h"
+#include "../include/csv.h"
+#include "../include/api.h"
 #include <string.h>
+#include "../include/person.h"
+#
 
 // Get the API version information
 const char* api_version()
@@ -71,13 +73,13 @@ tApiError api_initData(tApiData* data) {
     assert(data != NULL);
 
     // Inicializar la lista de personas
-    tApiError error = people_init(&data->personList);
+    tApiError error = people_init(&data->people);
     if (error != E_SUCCESS) {
         return error;
     }
 
     // Inicializar la lista de suscripciones
-    error = subscriptions_init(&data->subscriptionList);
+    error = subscriptions_init(&data->subscriptions);
     if (error != E_SUCCESS) {
         return error;
     }
@@ -93,12 +95,34 @@ tApiError api_initData(tApiData* data) {
 
 // Add a person into the data if it does not exist
 tApiError api_addPerson(tApiData* data, tCSVEntry entry) {
-	/////////////////////////////////
-	// PR1_3c
-	/////////////////////////////////
-	
-	/////////////////////////////////
-    return E_NOT_IMPLEMENTED;
+    assert(data != NULL);
+
+    // Validar que el tipo de entrada sea "PERSON"
+    if (strcmp(entry.type, "PERSON") != 0) {
+        return E_INVALID_ENTRY_TYPE;
+    }
+
+    // Validar que el número de campos sea correcto
+    if (entry.numFields != NUM_FIELDS_PERSON) {
+        return E_INVALID_ENTRY_FORMAT;
+    }
+
+    // Crear una nueva persona
+    tPerson person;
+    person_parse(&person, entry);
+
+    // Validar los datos de la persona (por ejemplo, fecha de nacimiento válida)
+    if (person.birthday.year < 1900 || person.birthday.year > 2025) {
+        return E_INVALID_ENTRY_FORMAT;
+    }
+
+    // Intentar agregar la persona
+    tApiError error = people_add(&data->people, person);
+    if (error == E_PERSON_DUPLICATED) {
+        return E_PERSON_DUPLICATED;
+    }
+
+    return error;
 }
 
 // Add a subscription if it does not exist
