@@ -1,0 +1,112 @@
+
+Prácticas de Programación
+08. TAD de TAD
+
+08. TAD de TAD
+
+
+ContenidosObjetivos
+Introducción
+Lista doblemente encadenadaDefinición del tipo
+Ejemplo de manipulación: rotateLeft
+
+
+Vector con lista encadenadaDefinición del tipo
+Ejemplo de manipulación: deleteVecDll
+
+
+Vector de listasDefinición del tipo
+Ejemplo de manipulación: insertVecList
+
+
+Resumen
+
+Objetivos
+Repaso  de la manipulación de los TAD secuencias (pilas,colas y listas).
+Diseño de nuevos TAD a partir de otros TAD ya conocidoscomo pila, cola y lista.
+
+Introducción
+En el módulo anterior de TAD se repasó el concepto de un TAD, lanecesidad de su utilización y se mostró la implementación de TADsecuencias (pila, cola y lista) utilizando memoria dinámica.
+Con el objetivo de modelar objetos de la realidad de una maneramás aproximada, es posible combinar los TAD ya vistos para crearnuevos TAD más complejos.
+En este módulo se presentan algunos ejemplos de nuevos TAD creados a partir de la combinación de TAD ya existentesdefinidos en el módulo TAD en memoria dinámica.
+Lista doblemente encadenada
+Definimos el TAD tDoubleLinkedList que contiene una lista doblemente encadenada de elementos. Cada nodo de la lista estáencadenado al elemento siguiente y al elemento anterior. Esto permite que se puedan realizar desplazamientos dentro de lalista en ambos sentidos. En el caso de la implementación mediante punteros, los encadenamientos al elemento siguiente yanterior se implementan mediante dos punteros: next y prev. El primer elemento es apuntado por el puntero first y el últimopor last.
+Este TAD facilita operaciones como el borrado de elementos, ya que para actualizar los encadenamientos, no es necesariobuscar el elemento anterior al elemento a borrar dado que es posible acceder a él directamente desde el elemento a borrar.
+En la figura 1 se muestra un ejemplo de representación de una lista doblemente encadenada:
+08_01.svg
+
+Figura 1. Ejemplo de representación de una lista doblemente encadenada utilizando punteros.
+Definición del tipo
+[Ejemplo 08_01]
+
+type    tNode = record        e: elem;        prev: pointer to tNode;        next: pointer to tNode;    end record
+    tDoubleLinkedList = record        first: pointer to tNode;        last: pointer to tNode;    end recordend type
+
+Ejemplo de manipulación: rotateLeft
+A continuación se muestra la implementación de la operación rotateLeft (dll, n), que realiza la rotación de elementos n lugaresa la izquierda en la lista dll. La rotación consiste en mover todos los elementos n posiciones a la izquierda dentro de lasecuencia de forma circular. Si un elemento llega al principio de la secuencia, deberá continuar por el final hasta completar losn desplazamientos.
+Nota: si el número n es cero o la lista está vacía o contiene sólo un elemento se retorna la lista dll sin cambios.
+[Ejemplo 08_02]
+
+action rotateLeft(inout dll: tDoubleLinkedList; in n: integer)
+    var        first: pointer to tNode;        last : pointer to tNode;        times: integer;    end var
+    if n > 0 and (not equal(dll.first, dll.last)) then        times := 0;
+        while times < n  do            first := dll.first;            last := dll.last;            dll.last := dll.first;            dll.first := (dll.first)^.next;            last^.next := first;            first^.prev := last;            (first^.next)^.prev := null;            first^.next := null;            times := times + 1;        end while    end if
+end action
+
+Vector con lista encadenada
+Un vector con una lista enlazada se trata de un conjunto de elementos almacenados en un vector, donde alguno de estoselementos también forman parte de una lista doblemente encadenada implementada con punteros.
+En la figura 2 se muestra un ejemplo de representación de un vector con una lista encadenada. En el ejemplo el vectorcontiene 7 elementos (v1, v2, v3, v4, v5, v6, v7) y la lista encadenada contiene estos 3 elementos y en este orden: v2, v3, v6 yv4.
+08_02.svg
+
+Figura 2. Vector con lista doblemente encadenada
+Definición del tipo
+[Ejemplo 08_03]
+
+type
+    tNode = record        e: elem;        prev: pointer to tNode;        next: pointer to tNode;    end record
+    tDoubleLinkedList = record        first: pointer to tNode;        last: pointer to tNode;    end record
+    tVectorDll = vector[MAX] of tNode;
+end type
+
+Ejemplo de manipulación: deleteVecDll
+A continuación se presenta la operación deleteVecDll que, dado un index del vector, elimina un elemento de la listadoblemente encadenada pero no del vector.
+El parámetro index indica el índice del vector donde se encuentra el elemento que queremos borrar de la lista doblementeencadenada. Si el índice es mayor que MAX o el elemento no forma parte de la lista, entonces devuelve un error. Se asumeque la lista no es vacía y que MAX es igual o superior a 3.
+Nota: un elemento no forma parte de la lista si se cumple que el puntero al siguiente y al anterior son nulos, y que no se tratade una lista encadenada con un sólo elemento.
+[Ejemplo 08_04]
+
+action deleteVecDll(inout v: tVectorDll, in index: integer, inout first: pointer to tNode, inout last: pointer to tNode)
+    if index > MAX then        writeString("error: invalid index");    else        if (not equal(first, last)) and v[index].prev = null and v[index].next = null then           writeString("error: element doesn't belong to the list");        else            if not equal(first, last) then                v[index].prev^.next := v[index].next;                v[index].next^.prev := v[index].prev;            else                first := null;                last := null;            end if        end if    end ifend action
+
+Vector de listas
+Un vector de listas se trata de un vector, donde cada uno de sus elementos es un puntero a una lista de elementosalmacenados fuera del vector.
+En la figura 3 se muestra un vector de listas. En el ejemplo la posición 1 del vector tiene un apuntador a una lista con 2elementos, mientras que la posición 2 del vector tiene un apuntador a la lista vacía.
+08_03.svg
+
+Figura 2. Vector de listas
+Definición del tipo
+[Ejemplo 08_05]
+
+type    tNode = record        e: elem;        next: pointer to tNode;    end record
+    tVectorList = vector[MAX] of pointer to tNode;end type
+
+Ejemplo de manipulación: insertVecList
+A continuación se presenta la operación insertVecList que, dado un index (índice) del vector y un elemento, lo inserta alcomienzo de la lista apuntada por el puntero de la posición del vector dada.
+[Ejemplo 08_06]
+
+action insertVecList(inout v: tVectorList, in index: integer, in e: elem)
+    if index > MAX then        writeString("error: invalid index");    else        insert(v[index], e);    end if
+end action
+
+Resumen
+En este módulo se han presentado ejemplos de definición de nuevos TAD a partir de TAD ya conocidos como pilas, colas ylistas. Hemos visto para cada caso, un ejemplo de manipulación con la implementación de una operación nueva sobre el TADnuevo.
+
+
+
+
+
+
+
+
+
+
+

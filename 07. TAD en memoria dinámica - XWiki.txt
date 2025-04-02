@@ -1,0 +1,802 @@
+Prácticas de Programación
+07. TAD en memoria dinámica
+
+
+07. TAD en memoria dinámica
+
+Contenidos
+Objetivos
+Introducción
+Tipo de datos puntero
+Definición
+Operaciones y primitivas de punteros
+Obtener espacio
+Liberar espacio
+Liberar espacio ocupado indirectamente
+Duplicar espacio
+Comparación de objetos
+
+
+
+
+
+
+Implementación de los TAD utilizando memoria dinámica
+Pila (tStack)
+Implementación del tipo
+Implementación de las operaciones
+Ejercicio ejemplo
+
+
+
+Cola (tQueue)
+Implementación del tipo
+Implementación de las operaciones
+Ejercicio ejemplo
+
+
+
+Lista (tList)
+Implementación del tipo
+Implementación de las operaciones
+Ejercicio ejemplo
+
+
+
+
+
+
+Resumen
+Bibliografía
+
+
+Objetivos
+
+Los objetivos de este módulo son:
+
+Repaso del concepto de tipo abstracto de datos(TAD).
+Repaso del concepto de memoria dinámica ypunteros.
+Presentación de operaciones y primitivas paramanipular punteros.
+Mostrar una implementación de los TAD pilas,
+colas y listas utilizando memoria dinámica.
+
+
+Introducción
+
+Recordamos que un TAD queda definido a través de unconjunto de valores o dominio y una serie deoperaciones que se le pueden aplicar. Laimplementación de las operaciones no se especifica yaque sólo se especifica como se comportan lasoperaciones. Esto significa que un mismo TAD puedeimplementarse de formas diferentes.
+
+Los TAD tratados en el módulo de Fundamentos deProgramación han sido: pilas, colas y listas. Se ha visto también una implementación básica del tipo y lasoperaciones utilizando vectores.
+
+La implementación utilizando vectores tiene algunas desventajas que se enumeran a continuación:
+
+En la implementación propuesta utilizando vectores, tanto para la inserción como en el borrado de elementos, se tienende desplazar todos los elementos hacia la derecha para generar un nuevo espacio, o hacia la izquierda para rellenar elrecientemente eliminado respectivamente.
+No se utiliza la memoria de forma óptima ya que se mantiene reservada una cantidad de espacio durante toda laejecución. Por otro lado si el tamaño reservado es insuficiente, no es posible modificarlo.
+
+
+Como alternativa de mejora a la implementación con vectores, en este módulo se presenta una propuesta de implementaciónde los TAD pila, cola y lista utilizando memoria dinámica.
+
+El espacio necesario para almacenar una estructura dinámica se reserva en tiempo de ejecución. Esto tiene la ventaja dehacer un uso óptimo de la memoria pero por otro lado podría suceder que no hubiera memoria disponible suficiente paracontinuar la ejecución.
+
+Para trabajar con la memoria dinámica será necesaria la utilización de un tipo de datos denominado puntero.
+
+En éste módulo recordaremos la definición del tipo de datos puntero, trabajaremos con memoria dinámica y veremos tambiénuna nueva propuesta de implementación de los TAD pila, cola y lista aplicando todos estos conceptos.
+
+Tipo de datos puntero
+
+
+
+
+Definición
+
+Una variable x de tipo de datos puntero a T, es un apuntador a un objeto de tipo de datos T. A través de la variable x esposible acceder a un objeto de tipo T.
+
+Un puntero es una variable cuyo valor es la dirección de memoria de comienzo del objeto apuntado.
+
+Por ejemplo si la variable x es de tipo puntero a entero, entonces la variable x apunta a un objeto de tipo entero. En la Figura1 se muestra la representación conceptual de apuntador, donde la variable x apunta a un objeto de tipo entero con valor 10, yla representación física, donde la variable x almacena el valor 0136 que corresponde a la dirección de memoria del objetoapuntado con valor 10.
+
+07_01.svg
+10xV3.1410C0136230120@x0128013201360140…
+…
+Conceptual representaonPhysical representaon…
+…
+addressvalue
+
+Figura 1. Ejemplo de un puntero a entero (Imagen extraída de [1])
+
+[Ejemplo 07_01]
+
+
+
+type 
+tExample = record 
+e: integer; 
+end record
+
+ tPointerExample = pointer to tExample;
+end type
+
+Operaciones y primitivas de punteros
+
+A continuación se definen las operaciones para obtener (getMemory) y liberar (freeMemory) espacio de memoria en formadinámica, así como la primitiva utilizada para acceder a objetos apuntados, así como otras primitivas necesarias para lamanipulación de punteros.
+
+El valor null es un valor especial que indica que el puntero no apunta a ningún sitio. Si la función getMemory no logra obtenerel espacio solicitado retorna el valor null. La función freeMemory además de liberar el espacio en memoria apuntado por elpuntero parámetro, asigna el valor null al puntero recibido como parámetro.
+
+Obtener espacio
+
+Esta función que llamaremos getMemory, se utiliza para solicitar al sistema operativo una cantidad determinada de espacio enmemoria durante la ejecución de un programa. Si la función getMemory no logra obtener el espacio solicitado retorna el valornull.
+
+[Ejemplo 07_02]
+
+
+
+
+var 
+p: tPointerExample;
+end var
+
+p:= getMemory();
+
+if p = null then 
+writeString("Error: not enough free memory");
+end if
+
+Liberar espacio
+
+Esta función que llamaremos freeMemory, se utiliza para liberar espacio de memoria previamente reservada durante laejecución del programa. La función freeMemory además de liberar el espacio en memoria apuntado por el puntero parámetro,
+asigna el valor null al puntero recibido como parámetro.
+
+[Ejemplo 07_03]
+
+
+
+var 
+p: tPointerExample;
+end var
+
+{ ... }
+{ p is a punter to previously allocated memory }
+freeMemory(p);
+
+Liberar espacio ocupado indirectamente
+
+Para asegurarnos que no se generan sitios de memoria sin referencia o retales (se sugiere referirse a [1], página 49:
+Referencias colgadas), se define esta función que llamaremos destroy. Esta función no sólo libera el espacio del objetoparámetro, sino que también si este objeto a su vez es una estructura con punteros que apuntan a otros objetos, el espacio deestos últimos también es liberado y así sucesivamente en forma recursiva.
+
+De esta forma se obtiene independencia de la implementación del TAD. La implementación de la función destroy esdependiente de la implementación del TAD elegida y de la estructura de datos concreta. Por este motivo solo se muestra suuso en lenguaje algorítmico.
+
+[Ejemplo 07_04]
+
+
+
+var 
+e: tExample;
+end var
+
+{ ... }
+{ e is an object previously initialized }
+destroy(e);
+
+Duplicar espacio
+
+En una asignación clásica de variables, por ejemplo: dos variables enteras a y b, al efectuar la asignación a:= b , tendremosque el valor de la variable b se ha copiado en la variable a. Ambas variables ocupan lugares de memoria diferentes y sonindependientes.
+
+
+El resultado de la asignación de un puntero p1 a otro puntero p2, es decir p2 := p1, da como resultado que el valor contenidoen el puntero origen (p1) se copia en el puntero destino (p2). Después de esta asignación ambos punteros tienen el mismovalor, lo que significa que ambos punteros apuntan al mismo objeto o lugar de memoria. Por lo tanto cualquier modificación deesta área de memoria realizada a través de un puntero, también será visible si accedemos a través del otro puntero.
+
+Si lo que se desea es realizar una copia de un objeto e1 en otro objeto e2, introducimos una nueva operación que llamaremosduplicate y que realiza una copia exacta de un objeto sobre otro del mismo TAD. Esta función retorna un objeto copia exactadel objeto original. Esta función no sólo copia el valor del objeto parámetro, sino que también si este objeto a su vez es unaestructura con punteros que apuntan a otros objetos, el espacio de estos últimos también es duplicado y así sucesivamenteen forma recursiva.
+
+De esta forma se obtiene independencia de la implementación del TAD. La copia de objetos se realiza con la función duplicatesin tener en cuenta la implementación concreta del TAD. La implementación de la función duplicate es dependiente de laimplementación del TAD elegida y de la estructura de datos concreta. Por este motivo solo se muestra su uso en lenguajealgorítmico.
+
+[Ejemplo 07_05]
+
+
+
+var 
+e1, e2: tExample;
+end var
+
+{ ... }
+{ e1 is an object previously initialized }
+duplicate(e2, e1);
+
+Comparación de objetos
+
+La comparación de dos objetos apuntados por dos punteros p1 y p2, no se puede reducir únicamente a la comparación dedos objetos e1 y e2. Si estos objetos son una estructura con punteros que apuntan a otros objetos, estos últimos quedaríanfuera de la comparación. Por lo tanto, al igual que en las operaciones de duplicate y destroy, el algoritmo que implementa estaoperación ha de contemplar esta recursividad. Esto significa que no alcanza con aplicar el operador de igualdad: e1 = e2 pararealizar la operación.
+
+Por este motivo se introduce la operación equal que realiza una comparación recursiva completa de los objetos pasadoscomo parámetro. Para mayor información referirse a [1], página 46: 2) Comparación.
+
+De esta forma, la función equal independiza al código de la implementación concreta del TAD y la estructura. Sin embargo, laimplementación de la función equal es dependiente de la implementación del TAD elegida y de la estructura de datosconcreta. Por este motivo solo se muestra su uso en lenguaje algorítmico.
+
+[Ejemplo 07_06]
+
+
+
+var 
+e1, e2: tExample;
+end var
+
+{ ... }
+{ e1 and e2 are objects previously initialized }
+if equal(e1, e2) then 
+{ ... }
+end if
+
+Implementación de los TAD utilizando memoria dinámica
+
+En la implementación con vectores todos los elementos del TAD se encontraban en posiciones consecutivas en memoria. Enla implementación con memoria dinámica no necesariamente los elementos estan en posiciones consecutivas de memoria.
+Esto sucede por el hecho de que cada posición se va reservando en forma dinámica durante la ejecución, por lo que el gestor
+
+
+de memoria del sistema operativo retorna un puntero al primer sitio que encuentra que tiene el tamaño solicitado.
+
+Para encadenar los diferentes elementos del TAD se utilizan los punteros. Cada elemento del TAD tiene siempre al menos uncampo que almacena un puntero al siguiente elemento en el TAD. Denominaremos nodo a cada elemento de una estructuraimplementada con punteros.
+
+A continuación se presenta la implementación de los TAD pila, cola y lista utilizando punteros, es decir memoria dinámica.
+Para esta implementación con punteros las funciones fullStack, fullQueue and fullList que se utilizaban en la implementacióncon vectores, ya no se utilizan dado que no se establece un límite máximo de elementos.
+
+Pila (tStack)
+
+Recordamos que el TAD pila es una secuencia lineal de elementos donde sólo se puede insertar y eliminar elementos por lacima de la pila. En la Tabla 1 se listan las operaciones que definen este TAD.
+
+Tabla 1. Lista de operaciones sobre el TAD stack
+
+OperaciónDescripción 
+createStack Crea una pila vacía 
+push Empila un elemento en la pila 
+pop Desempila un elemento de la pila 
+top Devuelve el elemento situado en el tope de la pila 
+emptyStack Devuelve true si la pila está vacía, false en caso contrario
+
+Implementación del tipo
+
+La implementación propuesta se basa en punteros. El primer elemento de la pila, es decir el que se encuentra en la cima esapuntado por el puntero first, excepto cuando la pila está vacía, en cuyo caso tiene el valor null.
+
+En la Figura 2 se muestra a la izquierda la representación gráfica de una pila, donde el elemento en la cima (top) es el vn. A laderecha se muestra la representación de la pila utilizando punteros. El elemento apuntado por el puntero first es el que estáen la cima de la pila. Cada elemento tiene a su vez un puntero al siguiente elemento en la pila. El elemento que está en labase de la pila (el primero que fue insertado) tiene el puntero al siguiente con valor null.
+
+07_02.svg
+topV2V1V3…
+VntopVnV3V2V1…
+firstNULL
+
+Figura 2. Representación de una pila (izquierda) e implementación mediante punteros (derecha). Imagen extraída y adaptadade [1].
+
+[Ejemplo 07_07]
+
+
+
+type 
+tNode = record 
+e: elem;
+
+
+next: pointer to tNode; 
+end record
+
+ tStack = record 
+first: pointer to tNode; 
+end recordend type
+
+Implementación de las operaciones
+
+Tanto en la operación de apilar (push) como en la operación de desapilar (pop), la manipulación de elementos se realiza por elextremo final de la secuencia que es también el tope de la pila.
+
+07_03.svg
+V3V2V1tmpV2V1firstfirstNULLNULL
+
+Figura 3. Operación desapilar (pop). Imagen extraída y adaptada de [1]
+
+[Ejemplo 07_08]
+
+
+
+function createStack(): tStack
+
+ var 
+s: tStack; 
+end var
+
+ s.first := null; 
+retorna s;
+
+end function
+
+action push(inout s: tStack; in e: elem)
+
+ var 
+tmp: pointer to tNode; 
+end var
+
+ tmp := getMemory();
+
+ if tmp = null then 
+writeString("error: not enough free memory"); 
+else 
+duplicate(tmp^.e, e); 
+tmp^.next := s.first; 
+s.first := tmp; 
+end if
+
+end action
+
+action pop(inout s: tStack)
+
+
+var 
+tmp: pointer to tNode; 
+end var
+
+ if s.first = null then 
+writeString("error: empty stack"); 
+else 
+tmp := s.first; 
+s.first := (s.first)^.next; 
+destroy(tmp^.e); 
+freeMemory(tmp); 
+end if
+
+end action
+
+function top(s: tStack): elem
+
+ var 
+e: elem; 
+end var
+
+ if s.first = null then 
+writeString("error: empty stack"); 
+else 
+duplicate(e, (s.first)^.e); 
+end if
+
+ return e;
+
+end function
+
+function emptyStack(s: tStack): boolean 
+return (s.first = null);
+end function
+
+Ejercicio ejemplo
+
+En este ejercicio ejemplo extendemos el TAD pila con una nueva operación: popn. Esta operación retorna la pila sin los nprimeros elementos, siendo n un número entero mayor que cero. Si la pila contiene menos de n elementos, entoncesdevuelve error.
+
+Para resolverlo utilizamos la definición del tipo pila tal como se define en este módulo. Se trabaja directamente con laimplementación del tipo pila. No se utiliza ninguna de las operaciones básicas del tipo (pop, top, push, ...).
+
+[Ejemplo 07_09]
+
+
+
+action popn(inout s: tStack; in n: integer)
+
+ var 
+tmp : pointer to tNode; 
+count: integer; 
+end var
+
+ if s.first = null then 
+writeString("error: empty stack"); 
+else
+
+ count := 0; 
+while ((s.first)^.next ≠ NULL and count<n) do 
+tmp := s.first; 
+s.first := (s.first)^.next; 
+destroy(tmp^.e); 
+freeMemory(tmp); 
+count := count+1; 
+end while
+
+
+if count < n then 
+writeString("error: stack with less than n elements"); 
+end if 
+end if
+
+end action
+
+Cola (tQueue)
+
+Recordamos que una cola (queue) es una secuencia lineal de elementos con la característica que los elementos se insertanpor el final de la cola y se extraen por el principio de la cola. En la Tabla 2 se listan las operaciones que definen este TAD.
+
+Tabla 2. Lista de operaciones sobre el TAD queue
+
+OperaciónDescripción 
+createQueueCrea una cola vacía 
+enqueue Inserta un elemento en la cola 
+dequeue Elimina un elemento de la cola 
+head Devuelve el elemento situado al comienzo de la cola 
+emptyQueue Devuelve true si la cola está vacía, false en caso contrario
+
+Implementación del tipo
+
+La implementación propuesta se basa en punteros. El primer elemento de la cola, que es por donde se desencolan loselementos, es apuntado por el puntero first, y el final de la cola, que es el extremo por donde se encolan los elementos, esapuntado por el puntero last.
+
+En la Figura 4 se muestra a la izquierda la representación gráfica de una cola, donde el primer elemento (head) es v1. A laderecha se muestra la representación de la cola utilizando punteros. El puntero first, indica el primer elemento (el siguiente aser extraído), mientras que el elemento apuntado por last indica el último insertado. Cada elemento tiene a su vez un punteroal siguiente elemento en la cola. El último elemento de la cola tiene el puntero al siguiente con valor null.
+
+07_04.svg
+headV1headV1V3…VnV2firstV2V3…VnlastNULL
+
+Figura 4. Representación de una cola (izquierda) e implementación mediante punteros (derecha). Imagen extraída y adaptadade [1]
+
+[Ejemplo 07_10]
+
+
+
+type 
+tNode = record 
+e: elem; 
+next: pointer to tNode; 
+end record
+
+
+tQueue = record 
+first: pointer to tNode; 
+last: pointer to tNode; 
+end recordend type
+
+Implementación de las operaciones
+
+Los elementos se encolan (operación enqueue) por el final de la cola y se desencolan (operación dequeue) por el principio dela cola (posición 1). Únicamente se tienen que actualizar los punteros al primer elemento (en caso de eliminar un elemento) oel puntero al final de la cola (en caso de insertar un elemento).
+
+07_05.svg
+V3V2V1firsttmplasteV3V2V1firstlasteNULLNULL
+
+Figura 5. Operación encolar (enqueue). Imagen extraída y adaptada de [1]
+
+En la Figura 5 se muestra gráficamente el algoritmo seguido para encolar un elemento en la cola (enqueue). En la cola loselementos se insertar por el extremo final. El extremo final de una cola está apuntado por el puntero last. Para insertar unnuevo elemento, primero se ha de obtener espacio para el nuevo nodo, tmp en el dibujo, y a continuación se deben actualizarel valor de los punteros de forma de enlazar tmp a la cola. Por último se debe actualizar el puntero last, que apunta ahora alnuevo elemento, es decir el último insertado.
+
+[Ejemplo 07_11]
+
+
+
+function createQueue(): tQueue
+
+ var 
+q: tQueue; 
+end var
+
+ q.first := null; 
+q.last := null; 
+return q;
+
+end function
+
+action enqueue(inout q: tQueue; in e: elem)
+
+ var 
+tmp: pointer to tNode; 
+end var
+
+ tmp := getMemory();
+
+ if tmp = null then 
+writeString("error: not enough free memory"); 
+else 
+duplicate(tmp^.e, e); 
+tmp^.next := null;
+
+
+if q.first = null then 
+{ empty queue } 
+q.first := tmp; 
+else 
+(q.last)^.next := tmp; 
+end if 
+q.last := tmp; 
+end if
+
+end action
+
+action dequeue(inout q: tQueue)
+
+ var 
+tmp: pointer to tNode 
+end var
+
+ if q.first = null then 
+writeString("error: empty queue"); 
+else 
+tmp := q.first; 
+q.first := (q.first)^.next;
+
+ if q.first = null then 
+q.last := null; 
+enf if
+
+ destroy(tmp^.e); 
+freeMemory(tmp); 
+end if
+
+end action
+
+function head(q: tQueue): elem
+
+ var 
+e: elem 
+end var
+
+ if q.first = null then 
+writeString("error: empty queue"); 
+else 
+duplicate(e, (q.first)^.e); 
+end if
+
+ return e;
+
+end function
+
+function emptyQueue(q: tQueue): boolean 
+return (q.first = null);
+end function
+
+Ejercicio ejemplo
+
+En este ejercicio ejemplo extendemos el TAD cola con una nueva operación: swapFirst2. Esta operación retorna la cola conlos dos primeros elementos intercambiados de posición. Si la cola contiene menos de 2 elementos, entonces devuelve error.
+
+Para resolverlo utilizamos la definición del tipo cola tal como se define en este módulo. Se trabaja directamente con laimplementación del tipo cola. No se utiliza ninguna de las operaciones básicas del tipo (enqueue, dequeue, head, ...).
+
+[Ejemplo 07_12]
+
+
+
+action swapfirst2(inout q: tQueue)
+
+
+var 
+tmp: pointer to tNode; 
+end var
+
+ if q.first = null then 
+writeString("error: empty queue"); 
+else
+
+ if (q.first)^.next = null then 
+writeString("error: queue with only one element"); 
+else 
+tmp := q.first 
+q.first := (q.first)^.next; 
+tmp^.next:= (tmp.next)^.next; 
+(q.first)^.next := tmp; 
+end if
+
+ end if
+
+end action
+
+Lista (tList)
+
+Recordamos que una lista es una secuencia lineal de elementos con la característica que es posible insertar, eliminar yconsultar elementos en cualquier posición de la secuencia. En la Tabla 3 se listan las operaciones que definen este TAD.
+
+Tabla 3. Lista de operaciones sobre el TAD list.
+
+OperaciónDescripción 
+createList crea una lista vacía 
+insert inserta un elemento en la lista 
+delete elimina un elemento de la lista 
+get devuelve el elemento situado en una posición dada de la lista 
+end devuelve true si el puntero pasado como parámetro apunta a nulo, false en caso contrario 
+emptyList devuelve true si la lista está vacía, false en caso contrario
+
+Implementación del tipo
+
+La implementación propuesta se basa en punteros. Para ello se dispone de un puntero al primer elemento de la lista quedenominamos first. Dado que tanto la inserción como el borrado de elementos se pueden realizar en cualquier posición de lalista, será necesario desplazar el puntero del comienzo hasta la posición deseada. Sin embargo, no se debe perder nunca elpuntero al comienzo de la lista ya que los desplazamientos son solo en un sentido, por lo que si se pierde esta referencia noserá posible nunca más volver al comienzo de la lista.
+
+Esta es una propuesta de implementación alternativa a la indicada en los apuntes de la bibliografía. Las diferenciasprincipales son que en la implementación de los apuntes se mantiene un puntero al elemento anterior al actual (punto deinterés) y un elemento fantasma. Este elemento fantasma existe para que la utilización y mantenimiento de este puntero alelemento anterior sea homogénea no importando si el elemento actual o punto de interés es el primer elemento. De estaforma se facilita su implementación y no hay que diferenciar el primer caso en operaciones como la inserción y el borrado deelementos de la implementación aquí propuesta.
+
+Asimismo, en la implementación de los apuntes la inserción y borrado se realizan a partir de la posición del elemento actualmientras que en la implementación aquí propuesta la inserción y borrado se realizan en la posición explícita indicada comoparámetro de la operación.
+
+En la Figura 6 se muestra a la izquierda la representación gráfica de una lista. A la derecha se muestra la representación de lalista utilizando punteros. El puntero first, apunta al primer elemento de la lista. Cada elemento ocupa una posición (ordinal enla lista) indicada en la figura como index. Cada elemento tiene a su vez un puntero al siguiente elemento en la lista. El últimoelemento de la lista tiene el puntero al siguiente con valor null.
+
+
+07_06.svg
+V4V5V3V2V1V1V3V4V5V2firstNULLindex = 4index = 4
+
+Figura 6. Representación de una lista (izquierda) e implementación mediante punteros (derecha).
+
+[Ejemplo 07_13]
+
+
+
+type 
+tNode = record 
+e: elem; 
+next: pointer to tNode; 
+end record
+
+ tList = record 
+first: pointer to tNode; 
+end recordend type
+
+Implementación de las operaciones
+
+Tanto la inserción de elementos (operación insert) como el borrado (operación delete) se pueden realizar en cualquierposición de la lista. Cada vez que se inserta un nuevo elemento, unicamente habrá que encontrar la posición correspondientey modificar el encadenado de punteros. Lo mismo sucede al eliminar un elemento de la lista: se deben actualizar los punterosal siguiente del elemento anterior al eliminado.
+
+07_07.svg
+V1V2V3firsttmpV1V3firstNULLNULLprevindex = 2index = 2
+
+Figura 7. Operación eliminar (delete).
+
+En la Figura 7 se muestra gráficamente el algoritmo seguido para eliminar un elemento de la lista (delete). En el ejemplo de lafigura se elimina el elemento con ordinal 2, es decir el que está en la segunda posición comenzando por el elemento apuntadopor first. Se recorre primero la lista buscando la posición index=2. Se mantiene un puntero al elemento anterior (prev) para
+
+
+actualizar luego los punteros del elemento anterior al elemento siguiente al eliminado. La memoria ocupada por el elemento aeliminar (tmp) es liberada.
+
+[Ejemplo 07_14]
+
+
+
+function createList(): tList 
+l.first := null;
+end function
+
+action insert(inout l: tList; in e: elem; in index: integer)
+
+ var 
+tmp: pointer to tNode; 
+prev: pointer to tNode; 
+end var
+
+ tmp := getMemory(); 
+si tmp = null then 
+writeString("error: not enough free memory"); 
+else
+
+ duplicate(tmp^.e, e); 
+if index = 1 then 
+{ no previous element } 
+tmp^.next := l.first; 
+l.first := tmp; 
+else
+
+ prev := getNth(l, index-1); 
+if prev ≠ null then 
+{ standard case } 
+tmp^.next := prev^.next; 
+prev^.next := tmp; 
+else 
+writeString("error: not enough elements"); 
+end if
+
+ end if 
+end if
+
+end action
+
+action delete(inout l: tList; in index: integer)
+
+ var 
+tmp: pointer to tNode; 
+prev: pointer to tNode; 
+end var
+
+ if index = 1 then
+
+ { no previous element } 
+tmp := l.first; 
+if tmp = null then 
+writeString("error: empty list"); 
+else 
+l.first := tmp^.next; 
+destroy(tmp^.e); 
+freeMemory(tmp); 
+end if
+
+ else
+
+ prev := getNth(l, index-1); 
+if prev ≠ null then 
+{ standard case } 
+tmp := prev^.next;
+
+
+if tmp = null then 
+writeString("error: index position doesn't exist"); 
+else 
+prev^.next := tmp^.next; 
+destroy(tmp^.e); 
+freeMemory(tmp); 
+end if
+
+ else 
+writeString("error: index position doesn't exist"); 
+end if
+
+ end ifend action
+
+function get(l: tList; index: integer): elem
+
+ var 
+e: elem; 
+curr: pointer to tNode; 
+end var
+
+ curr := getNth(l, index); 
+if curr = null then 
+writeString("error: index position doesn't exist"); 
+else 
+duplicate(e, curr^.e); 
+end if
+
+ return e;
+end function
+
+function end(n: pointer to tNode): boolean 
+return (n = null);
+end function
+
+function emptyList(l: tList): boolean 
+return (l.first = null);
+end function
+
+{ Auxiliary function }
+function getNth(l: tList; index: integer): pointer to tNode
+
+ var 
+i: integer; 
+prev: pointer to tNode; 
+end var
+
+ i := 1; 
+prev := l.first; 
+while i < index and prev ≠ null do 
+prev := prev^.next; 
+i := i+1; 
+end while
+
+ return prev;
+
+end function
+
+Ejercicio ejemplo
+
+En este ejercicio ejemplo extendemos el TAD lista con una nueva operación: getIndex. Esta operación devuelve el índicedel elemento recibido como parámetro1. Si la lista no contiene el elemento, entonces devuelve error.
+
+Para resolverlo utilizamos la definición del tipo lista tal como se define en este módulo. Se trabaja directamente con laimplementación del tipo lista. No se utiliza ninguna de las operaciones básicas del tipo (insert, delete, get, ...).
+
+
+[Ejemplo 07_15]
+
+
+
+function getIndex(l: tList; e: elem): integer
+
+ var 
+res: integer; 
+i: integer; 
+current: pointer to tNode; 
+found: boolean 
+end var
+
+ found := false; 
+res := 0; 
+i := 0; 
+current := l.first; 
+while current ≠ null and found = false do 
+found := equal(current^.e, e); 
+i := i+1; 
+current := current^.next; 
+end while
+
+ if found = false then 
+writeString("error: element does not exist"); 
+else 
+res := i; 
+end if
+
+ return res;
+
+end function
+
+Resumen
+
+En este módulo hemos recordado que significa un Tipo Abstracto de Datos (TAD) así como los TAD que respresentansecuencias: pilas, colas y listas.
+
+Asimismo se ha recordado el concepto de punteros y de memoria dinámica.
+
+Se ha mostrado una implementación de los TAD pila, cola y listas utilizando punteros. Para cada tipo de TAD se muestra unejercicio ejemplo basado en agregar una operación más al TAD, donde en la resolución trabaja directamente con laimplementación del TAD.
+
+Bibliografía
+
+[1] Estructuras de datos básicas: Secuencias. Xavier Sáez Pous. Material docente de la UOC.
+
+

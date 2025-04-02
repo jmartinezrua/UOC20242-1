@@ -1,0 +1,100 @@
+Ejercicio 3: Entrada de datos [40%] 
+ 
+Material de consulta 
+●​Apartados de la xWiki: Diseño descendente y TAD de TAD 
+
+Hasta ahora hemos estado trabajando solo con los datos de personas (tPeople), sus suscripciones (tSubscriptions) y, más recientemente, con el catálogo de películas de la aplicación (tCatalog). Para facilitar la interacción con la API, queremos agrupar todos los datos con los que trabajamos en una única estructura de datos (tApiData). Esta estructura debe almacenar los siguientes datos: 
+●​people: Conjunto de personas que son usuarias de la aplicación. Cada persona está identificada de manera única a partir de su documento de identidad. Los datos de una persona se almacenan en un tipo tPerson. El conjunto de personas se guarda en una tabla (tPeople).​ 
+●​subscriptions: Conjunto de suscripciones dadas de alta en el sistema. Cada suscripción está identificada de manera única a partir de un identificador entero y se puede relacionar con una persona previamente dada de alta a partir de su documento de identidad. Los datos de cada suscripción se almacenan en una estructura de tipo tSubscription. El conjunto de suscripciones se guarda en una tabla (tSubscriptions). 
+
+ 
+A partir de esta práctica, se almacena un TAD que contiene dos listas enlazadas con la información de las películas dadas de alta en la aplicación tal como se ha puesto en práctica en el ejercicio anterior: una que contiene todas las películas (tFilmList) y otra que contiene las referencias a las películas gratuitas (tFreeFilmList). Por lo tanto, la estructura de datos (tApiData) también debe almacenar los siguientes datos:​ 
+●​catalog: Esta estructura almacena las películas de la aplicación. Cada película se identifica de manera única a partir de su nombre. Los datos de las películas se almacenan en un tipo tFilm. El conjunto de películas se guarda en una lista enlazada (tFilmList). Asimismo, las referencias a las películas gratuitas se almacenan en otra lista enlazada (tFreeFilmList). El conjunto de listas enlazadas mencionadas anteriormente se almacenan en un TAD de tipo tCatalog. 
+
+ 
+Como parte del enunciado de la práctica se proporcionan los siguientes archivos: 
+ 
+●​api.h/api.c con la declaración e implementación de los tipos de datos y métodos de la API. 
+●​error.h con la declaración de los tipos de error que retornará la API (ya mencionado en el ejercicio anterior). 
+●​csv.h/csv.c con la declaración e implementación de los tipos de datos y métodos relacionados con la gestión de datos en formato CSV. 
+●​date.h/date.c con la declaración e implementación de los tipos de datos y métodos relacionados con la manipulación de fechas. 
+●​person.h/person.c con la declaración e implementación de los tipos de datos y métodos relacionados con la gestión de personas. 
+●​subscription.h/subscription.c con la declaración e implementación de los tipos de datos y métodos relacionados con las suscripciones. 
+●​film.h/film.c con la declaración e implementación de los tipos de datos y métodos relacionados con las películas y el catálogo. 
+
+ 
+Estos datos se consultarán y manipularán mediante los métodos de la API (definidos en el archivo api.h), los cuales generalmente retornarán un valor de tipo tApiError que indicará si se ha producido algún error o si la acción se ha ejecutado correctamente. Los códigos de error están definidos en el archivo error.h de la biblioteca. 
+A continuación se detallan algunos de los posibles errores: 
+ 
+E_SUCCESS 
+ Operación ejecutada correctamente. 
+ 
+E_NOT_IMPLEMENTED 
+ La funcionalidad aún no está implementada. 
+ 
+E_INVALID_ENTRY_TYPE 
+ El tipo de dato es incorrecto. 
+ 
+E_INVALID_ENTRY_FORMAT 
+ El formato del dato no es correcto. 
+ 
+E_FILM_DUPLICATED 
+ Ya existe una película con ese nombre. 
+ 
+E_FILM_NOT_FOUND 
+ No existe ninguna película con ese nombre. 
+ 
+E_PERSON_DUPLICATED 
+ Ya existe una persona con ese documento. 
+ 
+E_PERSON_NOT_FOUND 
+ No existe ninguna persona con ese documento. 
+ 
+E_SUBSCRIPTION_DUPLICATED 
+ Ya existe una suscripción con ese identificador. 
+ 
+E_SUBSCRIPTION_NOT_FOUND 
+ No existe ninguna suscripción con ese identificador. 
+ 
+
+ 
+En general, las funciones devuelven el valor inicial E_NOT_IMPLEMENTED. Una vez implementadas, devuelven el valor E_SUCCESS si todo ha funcionado correctamente. En caso contrario, devuelven un código de error asociado al tipo de error producido. 
+ 
+Se solicita: 
+ 
+a)​PR1_3a: Completa la definición del tipo de datos tApiData en el archivo api.h para que almacene todos los datos requeridos. 
+
+ 
+b)​PR1_3b: Implementa la función api_initData en el archivo api.c, que inicializa una estructura de tipo tApiData dada. La función debe devolver E_SUCCESS.​ 
+c)​PR1_3c: Implementa la función api_addPerson en el archivo api.c para que, dada una estructura de tipo tApiData y una persona en formato CSV tCSVEntry, añada esta persona a los datos de la aplicación. Si la persona ya existe, la función no añadirá nada y deberá devolver un error de tipo E_PERSON_DUPLICATE. 
+
+ 
+Para cada dato, será necesario comprobar que el formato es correcto (asumimos que es correcto si el número de campos es el esperado, error asociado E_INVALID_ENTRY_FORMAT) y que el tipo es “PERSON” (puedes acceder al tipo mediante el método csv_getType, error asociado E_INVALID_ENTRY_TYPE). 
+ 
+En caso de finalizar correctamente, la función debe devolver E_SUCCESS. 
+ 
+Nota: En los archivos person.h y person.c encontrarás una nueva definición de person_parse que devuelve la información de una persona en una estructura de tipo tPerson. También encontrarás los métodos para gestionar la tabla de personas tPeople. Asimismo, tienes el método person_free para eliminar la memoria dinámica reservada temporalmente para guardar los datos de las personas.​ 
+d)​PR1_3d: Implementa la función api_addSubscription en el archivo api.c para que, dada una estructura de tipo tApiData y una suscripción en formato CSV tCSVEntry, añada esta suscripción a los datos de la aplicación. Si la suscripción ya existe, la función debe devolver un error de tipo E_SUBSCRIPTION_DUPLICATED. Además, si no existe ninguna persona con el documento de identidad recibido dentro de la suscripción, la función debe devolver un error de tipo E_PERSON_NOT_FOUND. 
+
+ 
+De manera análoga a la función anterior, se debe comprobar que el formato sea correcto y que el tipo también lo sea, siendo en este caso “SUBSCRIPTION”. En caso de que no lo sea por alguno de los dos motivos anteriores, la función debe devolver E_INVALID_ENTRY_FORMAT o E_INVALID_ENTRY_TYPE. 
+ 
+En caso de finalizar correctamente, la función debe devolver E_SUCCESS. 
+ 
+Nota: Es recomendable revisar las funciones que encontrarás en los archivos subscription.c y subscription.h. 
+ 
+e)​PR1_3e: Implementa la función api_addFilm en el archivo api.c para que, dada una estructura de tipo tApiData y una película en formato CSV tCSVEntry, agregue esta película en los datos de la aplicación. Tened en cuenta que, si la película es gratuita, también se debe añadir una referencia a la lista enlazada de películas gratuitas. Por otro lado, si la película ya existe dentro del catálogo de la aplicación, esta función debe devolver un error de tipo E_FILM_DUPLICATED.​​De nuevo, para cada dato, será necesario comprobar que el formato sea correcto y que el tipo sea “FILM”. En caso de que no cumpla alguna de las dos condiciones, deberá retornar los errores E_INVALID_ENTRY_FORMAT o E_INVALID_ENTRY_TYPE. 
+
+ 
+En caso de finalizar correctamente, la función debe devolver E_SUCCESS. 
+ 
+Nota: Es recomendable revisar las funciones que encontrarás en los archivos film.c y film.h. 
+ 
+f)​PR1_3f: Implementa los métodos api_peopleCount, api_subscriptionsCount, api_filmsCount y api_freeFilmsCount que, dada una estructura de datos de tipo tApiData, retornen la cantidad de personas, suscripciones, total de películas y la cantidad de películas gratuitas, respectivamente.​ 
+g)​PR1_3g: Implementa la función api_freeData en el archivo api.c que elimina toda la información almacenada en una estructura de tipo tApiData dada. 
+
+ 
+h)​PR1_3h: Implementa la función api_addDataEntry en el archivo api.c que, dada una estructura de tipo tApiData y un nuevo dato en formato CSV tCSVEntry, guarde este nuevo dato dentro de la estructura tApiData. Una entrada de datos puede ser de tipo “PERSON”, “SUBSCRIPTION” o “FILM”. Para cada dato, será necesario comprobar que el formato sea correcto (asumimos que es correcto si el número de campos es el esperado). Los posibles valores de retorno de esta función son los mencionados en los apartados anteriores. En cualquier caso, si la función finaliza sin ningún error, debe devolver E_SUCCESS. 
+
+ 
+Importante: para realizar esta práctica, es necesario aplicar el diseño descendente. De esta manera, es posible simplificar la solución de los ejercicios y evitar repetir código, es decir, no será necesario implementar dos o más veces la misma funcionalidad. 

@@ -1,7 +1,17 @@
 CC = gcc
-CFLAGS = -Wall -g
+CFLAGS = -Wall -g -O0 -DDEBUG_TRACE
 AR = ar
 ARFLAGS = rcs
+
+SRCS = api.c src/film.c src/csv.c src/date.c src/person.c src/subscription.c OBJS = $(SRCS:.c=.o) LIB = libUOCPlay.a
+
+all: $(LIB)
+
+$(LIB): $(OBJS) @mkdir -p lib $(AR) rcs $(LIB) $(OBJS)
+
+%.o: %.c $(CC) $(CFLAGS) -c $< -o $@
+
+clean: rm -f $(OBJS) $(LIB)
 
 SRC = src/api.c src/csv.c src/date.c src/film.c src/person.c src/subscription.c
 INCLUDES = -I./include

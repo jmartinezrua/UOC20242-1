@@ -1,0 +1,28 @@
+Ejercicio 2: Manipulación de TAD de TAD [20%] 
+ 
+Material de consulta 
+●​Apartados de la xWiki: TAD en memoria dinámica y TAD de TAD 
+
+En este ejercicio se deben codificar las funciones que permiten la manipulación del catálogo de películas de la aplicación. Como podéis observar en el archivo film.h, la aplicación almacena el conjunto de películas dentro de una lista enlazada. Además, también almacena una lista enlazada con las referencias de las películas que están disponibles en el plan gratuito. Es decir, la primera de la listas (tFilmList) contiene todas las películas y, la segunda (tFreeFilmList), contiene una referencia a las películas gratuitas. 
+Notar que en todo momento se habla de referencia en la segunda lista, por lo que se debe almacenar un puntero a una película ya existente en la primera lista. 
+Asimismo, veréis que muchas de las funciones de este archivo devuelven el tipo de dato tApiError, una enumeración que podéis encontrar en el archivo error.h. A continuación, os mostramos una tabla de los tipos de errores que se espera que devuelvan estas funciones para este ejercicio: 
+E_SUCCESS 
+ Operación ejecutada correctamente. 
+ 
+E_NOT_IMPLEMENTED 
+ La funcionalidad aún no está implementada. 
+ 
+E_FILM_DUPLICATED 
+ Ya existe una película con ese nombre. 
+ 
+E_FILM_NOT_FOUND 
+ No existe ninguna película con ese nombre. 
+ 
+
+Por lo tanto, en este ejercicio se solicita: 
+ 
+a)​PR1_2a: Codifica la función catalog_init para que se pueda iniciar la estructura tCatalog recibida por parámetro. En caso de que se inicialice correctamente, esta función debe devolver E_SUCCESS. 
+b)​PR1_2b: Codifica la función catalog_add para que añada una película dentro del catálogo de películas. Por lo tanto, se solicita que la película sea añadida en la lista de películas de la aplicación de tipo (tFilmList)  y, si esta es gratuita, también se añada una referencia a la lista de películas gratuitas de tipo (tFreeFilmList). En caso de que la película ya esté añadida, la función debe devolver E_FILM_DUPLICATED; si se añade correctamente, debe devolver E_SUCCESS. Controlad los errores debidamente en todo momento así como sus implicaciones (i.e. si la película no se ha podido añadir en la lista de películas, tampoco debe hacerlo en la lista de películas gratuitas a pesar de que lo sea). 
+c)​PR1_2c: Codifica la función catalog_del para que se elimine una película del catálogo de películas. Esto implica que la película sea eliminada de la lista de películas de tipo (tFilmList) y, si es gratuita, que también sea eliminada de la lista de películas gratuitas (tFreeFilmList). En caso de que la película no exista en la lista de películas, la función debe devolver E_FILM_NOT_FOUND; en caso contrario, debe devolver E_SUCCESS. 
+d)​PR1_2d: Codifica las funciones catalog_len y catalog_freeLen para que devuelvan la cantidad de películas totales y la cantidad de películas gratuitas respectivamente. 
+e)​PR1_2e: Codifica la función catalog_free para que elimine toda la información del catálogo de películas. En caso de que lo elimine correctamente, esta función debe devolver E_SUCCESS. 

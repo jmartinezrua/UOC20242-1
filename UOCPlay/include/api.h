@@ -6,7 +6,6 @@
 #include "person.h"
 #include "subscription.h"
 #include "film.h"
-#include "api.h"  // O el archivo correcto donde se define tApiData
 
 #define FILE_READ_BUFFER_SIZE 2048
 
@@ -15,9 +14,9 @@ typedef struct _ApiData {
     /////////////////////////////////
 	// PR1_3a
 	/////////////////////////////////
-    tPeople people;               // Lista de personas
-    tSubscriptions subscriptions; // Lista de suscripciones
-    tCatalog catalog;             // Catálogo de películas
+    tPeople people;              // Conjunto de personas (tabla de personas)
+    tSubscriptions subscriptions; // Conjunto de suscripciones (tabla de suscripciones)
+    tCatalog catalog;            // Catálogo de películas (contiene tFilmList y tFreeFilmList)
     /////////////////////////////////
 } tApiData;
 

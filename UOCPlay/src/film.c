@@ -118,69 +118,75 @@ tApiError filmList_init(tFilmList* list) {
 
 // Add a new film to the list
 tApiError filmList_add(tFilmList* list, tFilm film) {
-    assert(list != NULL);
-
-    // Crear un nuevo nodo
-    tFilmListNode* node = (tFilmListNode*)malloc(sizeof(tFilmListNode));
-    if (node == NULL) {
-        return E_MEMORY_ERROR; // Error de memoria
-    }
-
-    // Copiar los datos de la película al nodo
-    film_cpy(&node->elem, film);
-    node->next = NULL;
-
-    // Añadir el nodo al final de la lista
-    if (list->first == NULL) {
-        list->first = node;
-    } else {
-        list->last->next = node;
-    }
-    list->last = node;
-    list->count++;
-
-    return E_SUCCESS;
+	// Check preconditions
+	assert(list != NULL);
+	
+	tFilmListNode *node;
+	
+	// Check if the film is already in the list
+	if (filmList_find(*list, film.name) != NULL)
+		return E_FILM_DUPLICATED;
+	
+	// Create the node
+	node = (tFilmListNode*)malloc(sizeof(tFilmListNode));
+	assert(node != NULL);
+	
+	// Assign the properties of the nodes
+	film_cpy(&node->elem, film);
+	node->next = NULL;
+	
+	// Link the new node to the end of the list
+	if (list->first == NULL)
+		list->first = node;
+	else
+		list->last->next = node;
+	
+	list->last = node;
+	list->count++;
+	
+	return E_SUCCESS;
 }
 
 // Remove a film from the list
 tApiError filmList_del(tFilmList* list, const char* name) {
-    assert(list != NULL);
-    assert(name != NULL);
-
-    tFilmListNode *node = list->first, *prev = NULL;
-
-    // Buscar el nodo a eliminar
-    while (node != NULL) {
-        if (strcmp(node->elem.name, name) == 0) {
-            break;
-        }
-        prev = node;
-        node = node->next;
-    }
-
-    // Si no se encuentra el nodo, devolver error
-    if (node == NULL) {
-        return E_FILM_NOT_FOUND;
-    }
-
-    // Ajustar los punteros para eliminar el nodo
-    if (prev == NULL) {
-        list->first = node->next;
-    } else {
-        prev->next = node->next;
-    }
-
-    if (list->last == node) {
-        list->last = prev;
-    }
-
-    list->count--;
-
-    // Liberar la memoria del nodo
-    film_free(&node->elem);
-    free(node);
-
-    return E_SUCCESS;
+	// Check preconditions
+	assert(list != NULL);
+	assert(name != NULL);
+	
+	tFilmListNode *node, *prev;
+	
+	// Iterate until the node and remove it
+	node = list->first;
+	prev = NULL;
+	
+	while (node != NULL)
+	{
+		if (strcmp(node->elem.name, name) == 0)
+			break;
+		
+		prev = node;
+		node = node->next;
+	}
+	
+	// If node does not exist, return an error
+	if (node == NULL)
+		return E_FILM_NOT_FOUND;
+	
+	// Link the list without the node to remove
+	if (prev == NULL)
+		list->first = node->next;
+	else
+		prev->next = node->next;
+	
+	if (list->last == node)
+		list->last = prev;
+	
+	list->count--;
+	
+	film_free(&(node->elem));
+	free(node);
+	
+	return E_SUCCESS;
 }
 
 // Return a pointer to the film
@@ -241,92 +247,80 @@ tApiError freeFilmList_init(tFreeFilmList* list) {
 
 // Add a new free film to the list
 tApiError freeFilmList_add(tFreeFilmList* list, tFilm* film) {
-    assert(list != NULL);
-    assert(film != NULL);
+	// Check preconditions
+	assert(list != NULL);
+	assert(film != NULL);
 
-    // Verificar si la película ya existe en la lista de películas gratuitas
-    if (freeFilmList_find(*list, film->name) != NULL) {
-        return E_FILM_DUPLICATED; // La película ya existe
-    }
+	if (freeFilmList_find(*list, film->name) != NULL)
+		return E_FILM_DUPLICATED;
 
-    // Crear un nuevo nodo
-    tFreeFilmListNode* node = (tFreeFilmListNode*)malloc(sizeof(tFreeFilmListNode));
-    if (node == NULL) {
-        return E_MEMORY_ERROR; // Error de memoria
-    }
+	tFreeFilmListNode* node = (tFreeFilmListNode*)malloc(sizeof(tFreeFilmListNode));
+	assert(node != NULL);
 
-    // Almacenar la referencia a la película
-    node->elem = film;
-    node->next = NULL;
+	node->elem = film; // Store the reference
+	node->next = NULL;
 
-    // Añadir el nodo al final de la lista
-    if (list->first == NULL) {
-        list->first = node;
-    } else {
-        list->last->next = node;
-    }
-    list->last = node;
-    list->count++;
+	if (list->first == NULL)
+		list->first = node;
+	else
+		list->last->next = node;
 
-    return E_SUCCESS;
+	list->last = node;
+	list->count++;
+
+	return E_SUCCESS;
 }
 
 // Remove a free film from the list
 tApiError freeFilmList_del(tFreeFilmList* list, const char* name) {
-    assert(list != NULL);
-    assert(name != NULL);
+	// Check preconditions
+	assert(list != NULL);
+	assert(name != NULL);
 
-    tFreeFilmListNode *node = list->first, *prev = NULL;
+	tFreeFilmListNode *node = list->first, *prev = NULL;
 
-    // Buscar el nodo a eliminar
-    while (node != NULL) {
-        if (strcmp(node->elem->name, name) == 0) {
-            break;
-        }
-        prev = node;
-        node = node->next;
-    }
+	while (node != NULL)
+	{
+		if (strcmp(node->elem->name, name) == 0)
+			break;
+		prev = node;
+		node = node->next;
+	}
 
-    // Si no se encuentra el nodo, devolver error
-    if (node == NULL) {
-        return E_FILM_NOT_FOUND;
-    }
+	if (node == NULL)
+		return E_FILM_NOT_FOUND;
 
-    // Ajustar los punteros para eliminar el nodo
-    if (prev == NULL) {
-        list->first = node->next;
-    } else {
-        prev->next = node->next;
-    }
+	if (prev == NULL)
+		list->first = node->next;
+	else
+		prev->next = node->next;
 
-    if (list->last == node) {
-        list->last = prev;
-    }
+	if (list->last == node)
+		list->last = prev;
 
-    list->count--;
+	free(node);
+	list->count--;
 
-    // Liberar la memoria del nodo
-    free(node);
-
-    return E_SUCCESS;
+	return E_SUCCESS;
 }
 
-// Find a free film in the list by its name
+// Return a pointer to the free film
 tFilm* freeFilmList_find(tFreeFilmList list, const char* name) {
-    // Check preconditions
-    assert(name != NULL);
-
-    tFreeFilmListNode* node = list.first;
-
-    // Recorrer la lista de películas gratuitas
-    while (node != NULL) {
-        if (strcmp(node->elem->name, name) == 0) {
-            return node->elem; // Retorna un puntero a la película si se encuentra
-        }
-        node = node->next;
-    }
-
-    return NULL; // Retorna NULL si no se encuentra
+	// Check preconditions
+	assert(name != NULL);
+	
+	tFreeFilmListNode *node;
+	node = list.first;
+	
+	while (node != NULL)
+	{
+		if (strcmp(node->elem->name, name) == 0)
+			return node->elem;
+			
+		node = node->next;
+	}
+	
+	return NULL;
 }
 
 // Remove the free films from the list
@@ -353,71 +347,84 @@ tApiError freeFilmsList_free(tFreeFilmList* list) {
 
 // Initialize the films catalog
 tApiError catalog_init(tCatalog* catalog) {
+	/////////////////////////////////
+	// PR1_2a
+	/////////////////////////////////
+	// Comprobar que el puntero no sea NULL
     assert(catalog != NULL);
-
-    // Inicializar las listas de películas y películas gratuitas
-    tApiError error = filmList_init(&catalog->filmList);
-    if (error != E_SUCCESS) {
-        return error;
+    
+    // Inicializar la lista de películas
+    tApiError err = filmList_init(&catalog->filmList);
+    if (err != E_SUCCESS) {
+        return err;
     }
-
-    error = freeFilmList_init(&catalog->freeFilmList);
-    if (error != E_SUCCESS) {
-        return error;
+    
+    // Inicializar la lista de películas gratuitas
+    err = freeFilmList_init(&catalog->freeFilmList);
+    if (err != E_SUCCESS) {
+        return err;
     }
-
+	/////////////////////////////////
     return E_SUCCESS;
 }
 
 // Add a new film to the catalog
 tApiError catalog_add(tCatalog* catalog, tFilm film) {
-    // Verificar precondiciones
-    assert(catalog != NULL);
+	/////////////////////////////////
+	// PR1_2b
+	/////////////////////////////////
+	assert(catalog != NULL);
+    
+    // Verificar que la película no exista ya en el listado principal
+    if (filmList_find(catalog->filmList, film.name) != NULL)
+        return E_FILM_DUPLICATED;
+    
+    // Agregar la película al listado principal
+    tApiError err = filmList_add(&catalog->filmList, film);
+    if (err != E_SUCCESS)
+        return err;
+    
+    // Recuperar la referencia de la película recién agregada
+    tFilm* addedFilm = filmList_find(catalog->filmList, film.name);
+    if (addedFilm == NULL)
+        return E_MEMORY_ERROR; // Caso inesperado
 
-    // Verificar si la película ya existe en la lista de películas
-    if (filmList_find(catalog->filmList, film.name) != NULL) {
-        return E_FILM_DUPLICATED; // La película ya existe
+    // Si la película es gratuita, agregarla al listado de películas gratuitas
+    if (addedFilm->isFree) {
+        err = freeFilmList_add(&catalog->freeFilmList, addedFilm);
+        if (err != E_SUCCESS)
+            return err;
     }
-
-    // Intentar añadir la película a la lista de películas
-    tApiError error = filmList_add(&catalog->filmList, film);
-    if (error != E_SUCCESS) {
-        return error; // Error al añadir la película
-    }
-
-    // Si la película es gratuita, añadirla a la lista de películas gratuitas
-    if (film.isFree) {
-        error = freeFilmList_add(&catalog->freeFilmList, &catalog->filmList.last->elem);
-        if (error != E_SUCCESS) {
-            // Si falla, eliminar la película de la lista de películas
-            filmList_del(&catalog->filmList, film.name);
-            return error;
-        }
-    }
-
-    return E_SUCCESS; // Película añadida correctamente
+	/////////////////////////////////
+    return E_SUCCESS;
 }
 
 // Remove a film from the catalog
 tApiError catalog_del(tCatalog* catalog, const char* name) {
+	/////////////////////////////////
+	// PR1_2c
+	/////////////////////////////////
+	// Paso 1: Comprobar que los punteros no sean nulos
     assert(catalog != NULL);
     assert(name != NULL);
 
-    // Buscar la película en la lista de películas
-    tFilm* film = filmList_find(catalog->filmList, name);
-    if (film == NULL) {
-        return E_FILM_NOT_FOUND; // La película no existe
+    // Buscar la película en la lista principal
+    tFilm* filmPtr = filmList_find(catalog->filmList, name);
+    if (filmPtr == NULL) {
+        return E_FILM_NOT_FOUND; // O el error definido correspondiente
     }
 
     // Si la película es gratuita, eliminarla de la lista de películas gratuitas
-    if (film->isFree) {
-        tApiError error = freeFilmList_del(&catalog->freeFilmList, name);
-        if (error != E_SUCCESS) {
-            return error; // Error al eliminar de la lista de películas gratuitas
-        }
-    }
+    if (filmPtr->isFree) {
+		tApiError err = freeFilmList_del(&catalog->freeFilmList, filmPtr->name);
+		// Se puede ignorar un error de "no encontrada" si ya no estaba
+		if (err != E_SUCCESS && err != E_FILM_NOT_FOUND) {
+			return err;
+		}
+	}
 
-    // Eliminar la película de la lista de películas
+    // Ahora eliminarla de la lista principal, lo que liberará la memoria
+    /////////////////////////////////
     return filmList_del(&catalog->filmList, name);
 }
 
@@ -443,18 +450,23 @@ int catalog_freeLen(tCatalog catalog) {
 
 // Remove the films from the catalog
 tApiError catalog_free(tCatalog* catalog) {
+	/////////////////////////////////
+	// PR1_2e
+	/////////////////////////////////
+	// Comprobar que el puntero no sea NULL
     assert(catalog != NULL);
 
-    // Liberar las listas de películas y películas gratuitas
-    tApiError error = filmList_free(&catalog->filmList);
-    if (error != E_SUCCESS) {
-        return error;
-    }
-
-    error = freeFilmsList_free(&catalog->freeFilmList);
-    if (error != E_SUCCESS) {
-        return error;
-    }
-
+    tApiError err;
+    
+    // Liberar la lista principal de películas
+    err = filmList_free(&catalog->filmList);
+    if(err != E_SUCCESS)
+        return err;
+    
+    // Liberar la lista de películas gratuitas
+    err = freeFilmsList_free(&catalog->freeFilmList);
+    if(err != E_SUCCESS)
+        return err;
+	/////////////////////////////////
     return E_SUCCESS;
 }

@@ -1,0 +1,57 @@
+Ejercicio 4: Acceso a los datos [40%] 
+ 
+Material de consulta 
+●​Apartados de la xWiki: Diseño descendente y TAD de TAD 
+
+ 
+Con el fin de no exponer los tipos de datos internos de la API, se ha decidido que todos los intercambios de datos a través de la API se realizarán utilizando CSV. Recordad que cada entrada en un archivo CSV corresponde a un dato (fila, objeto, …), y que, por lo tanto, el archivo es un conjunto de datos. Utilizaremos el tipo tCSVData para intercambiar múltiples datos (por ejemplo, listados) y el tipo tCSVEntry para objetos únicos.  
+ 
+ 
+ 
+ 
+Se solicita: 
+a)​PR1_4a: Implementa la función api_getSubscription en el archivo api.c que, dada una estructura de tipo tApiData y el identificador de una suscripción, guarde los datos de la suscripción en una estructura de tipo tCSVEntry. El formato de la suscripción que debe devolver es el siguiente: 
+
+ 
+“id;document;start_date;end_date;plan;price;num_devices”​ 
+Por ejemplo: 
+ 
+“1;98765432J;01/01/2025;31/12/2025;Free;0;1” 
+“2;33365111X;01/05/2025;30/04/2026;Standard;29.95;3” 
+“3;12345672C;15/06/2025;14/06/2026;Standard;29.95;3” 
+“4;55565432Z;21/03/2025;20/03/2026;Free;0;1” 
+“5;47051307Z;01/01/2023;31/12/2028;Premium;29.95;3”​ 
+El tipo de registro contendrá el valor “SUBSCRIPTION”. Si la suscripción no existe, la función debe devolver un error de tipo E_SUBSCRIPTION_NOT_FOUND; en caso contrario, E_SUCCESS. 
+ 
+Nota: Es importante que el número de decimales para el campo price sea el mínimo posible tal como sucede en los ejemplos y que las fechas tengan el formato dd/mm/yyyy.​ 
+b)​PR1_4b: Implementa la función api_getFilm en el archivo api.c que, dada una estructura de tipo tApiData y el nombre de una película, almacene la información de la película con dicho nombre en una estructura de tipo tCSVEntry.  
+
+El formato de la película que debe devolver es el siguiente: 
+“name;duration;genre;release;rating;is_free” 
+​Por ejemplo: 
+“Interstellar;02:49;4;07/11/2014;4.8;0​“Blade Runner 2049;02:44;4;06/10/2017;4.6;1”​“The Matrix;02:16;4;31/03/1999;4.9;1”​“Inception;02:28;0;16/07/2010;4.7;1”​“Mad Max: Fury Road;02:00;0;15/05/2015;4.5;0” 
+El tipo de registro contendrá el valor “FILM”. Si la película no existe, la función debe devolver un error de tipo E_FILM_NOT_FOUND; en caso contrario, E_SUCCESS. 
+ 
+Nota: Es importante que el número de decimales para el campo rating sea solo 1, que la duración tenga el formato hh:mm y la fecha dd/mm/yyyy. 
+c)​PR1_4c: Implementa la función api_getFreeFilms en el archivo api.c que, dada una estructura de tipo tApiData, guarde los datos de todas las películas gratuitas registradas en una estructura de tipo tCSVData. Cada película se almacenará en una estructura de tipo tCSVEntry con el mismo formato que el apartado anterior: 
+
+“name;duration;genre;release;rating;is_free” 
+El tipo de registro contendrá el valor “FILM”. La función debe devolver E_SUCCESS.​ 
+d)​PR1_4d: Implementa la función api_getFilmsByGenre en el archivo api.c que, dada una estructura de tipo tApiData y un género, guarde los datos de todas películas del género recibido en una estructura de tipo tCSVData. Cada película se almacenará en una estructura de tipo tCSVEntry con el mismo formato que los dos apartados anteriores: 
+
+“name;duration;genre;release;rating;is_free” 
+El tipo de registro contendrá el valor “FILM”. La función debe devolver E_SUCCESS. 
+ 
+Nota: Podéis asumir que una cadena en formato CSV nunca superará los 2048 caracteres (2KB) de longitud. Los siguientes métodos pueden ser útiles para realizar este ejercicio: 
+ 
+csv_init / csv_free 
+ Inicializa / libera una estructura de tipo tCSVData 
+ 
+csv_parseEntry 
+ Llena una estructura de tipo tCSVEntry con la información contenida en una cadena en formato CSV 
+ 
+csv_addStrEntry 
+ Añade a una estructura de tipo tCSVData una nueva entrada (tCSVEntry) a partir de una cadena en formato CSV 
+ 
+sprintf 
+ Método similar a printf, pero que en lugar de mostrar la información formateada en pantalla, la guarda en una cadena

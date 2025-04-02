@@ -103,38 +103,36 @@ void person_cpy(tPerson* destination, tPerson source) {
 
 // Remove the data from a person
 void person_free(tPerson* data) {
-    // Check input data
     assert(data != NULL);
-    
-    // Release document data
-    if(data->document != NULL) free(data->document);
-    data->document = NULL;
-    
-    // Release name data
-    if(data->name != NULL) free(data->name);
-    data->name = NULL;
-    
-    // Release surname data
-    if(data->surname != NULL) free(data->surname);
-    data->surname = NULL;
-    
-    // Release phone data
-    if(data->phone != NULL) free(data->phone);
-    data->phone = NULL;
-    
-    // Release email data
-    if(data->email != NULL) free(data->email);
-    data->email = NULL;
-    
-    // Release address data
-    if(data->address != NULL) free(data->address);
-    data->address = NULL;
-    
-    // Release cp data
-    if(data->cp != NULL) free(data->cp);
-    data->cp = NULL;
+    if (data->document != NULL) {
+        free(data->document);
+        data->document = NULL;
+    }
+    if (data->name != NULL) {
+        free(data->name);
+        data->name = NULL;
+    }
+    if (data->surname != NULL) {
+        free(data->surname);
+        data->surname = NULL;
+    }
+    if (data->phone != NULL) {
+        free(data->phone);
+        data->phone = NULL;
+    }
+    if (data->email != NULL) {
+        free(data->email);
+        data->email = NULL;
+    }
+    if (data->address != NULL) {
+        free(data->address);
+        data->address = NULL;
+    }
+    if (data->cp != NULL) {
+        free(data->cp);
+        data->cp = NULL;
+    }
 }
-
 // Initialize the people data
 tApiError people_init(tPeople* data) {
     // Check input/output data
@@ -265,8 +263,8 @@ tApiError people_free(tPeople* data) {
     if (data->count > 0) {
         free(data->elems);
         data->elems = NULL;
-        data->count = 0;
+        
     }
-	
+	data->count = 0;
 	return E_SUCCESS;
 }

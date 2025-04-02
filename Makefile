@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -g
+CFLAGS = -Wall -g -O0 -DDEBUG_TRACE -I./UOCPlay/include -I./test/include
 AR = ar
 ARFLAGS = rcs
 

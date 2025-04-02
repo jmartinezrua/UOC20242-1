@@ -12,7 +12,8 @@
             "cStandard": "c11",
             "cppStandard": "c++17",
             "intelliSenseMode": "linux-gcc-x64"
-        }
+        },
+        { "name": "Linux", "includePath": [ "${workspaceFolder}/UOCPlay/include", "${workspaceFolder}/test/include", "${workspaceFolder}/**" ], "defines": ["DEBUG_TRACE"], "compilerPath": "/usr/bin/gcc", "cStandard": "c11", "intelliSenseMode": "linux-gcc-x64" }
     ],
     "version": 4
 }

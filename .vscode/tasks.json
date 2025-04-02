@@ -1,39 +1,51 @@
 {
-    "version": "2.0.0",
+    "version": "4",
     "tasks": [
         {
-            "label": "build",
+            "label": "make",
             "type": "shell",
             "command": "make",
+            "group": {
+              "kind": "build",
+              "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always"
+            }
+        }
+    ],
+    "configurations": [
+        {
+            "name": "Debug UOC20242",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/UOC20242d",
             "args": [],
-            "group": "build",
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "detail": "Generated task to build the project using Makefile."
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
         },
         {
-            "type": "cppbuild",
-            "label": "C/C++: gcc compilar archivo activo",
-            "command": "/usr/bin/gcc",
-            "args": [
-                "-fdiagnostics-color=always",
-                "-g",
-                "${file}",
-                "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/UOCPlay/include",
+                "${workspaceFolder}/test/include",
+                "${workspaceFolder}/**"
             ],
-            "options": {
-                "cwd": "${fileDirname}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "detail": "Tarea generada por el depurador."
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-x64"
         }
     ]
 }
